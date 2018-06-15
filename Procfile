@@ -1,1 +1,1 @@
-web: gunicorn slackrdoc.wsgi
+web: gunicorn app:app
