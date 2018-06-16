@@ -56,14 +56,13 @@ class Bot(object):
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         cur = conn.cursor()
-        cur.execute("CREATE TABLE IF NOT EXISTS authed_teams (id serial PRIMARY KEY, team_id varchar, bot_token varchar);")
+        cur.execute("CREATE TABLE IF NOT EXISTS authed_teams (id serial PRIMARY KEY, team_id varchar, bot_token varchar(256));")
         cur.execute(sql.SQL("select bot_token FROM authed_teams WHERE team_id = {}").format(sql.Literal(team_id)))
         db_token = cur.fetchone()
         if db_token is None:
             db_token = auth_response["bot"]["bot_access_token"]
-            cur.execute(sql.SQL("INSERT INTO authed_teams VALUES ({}, {})").format(sql.Literal(team_id), sql.Literal(db_token)))
+            cur.execute(sql.SQL("INSERT INTO authed_teams (team_id, bot_token) VALUES ({}, {})").format(sql.Literal(team_id), sql.Literal(db_token)))
             conn.commit()
-
         cur.close()
         conn.close()
         self.client = SlackClient(db_token)
