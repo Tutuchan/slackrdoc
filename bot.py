@@ -63,6 +63,8 @@ class Bot(object):
             db_token = auth_response["bot"]["bot_access_token"]
             cur.execute(sql.SQL("INSERT INTO authed_teams (team_id, bot_token) VALUES ({}, {})").format(sql.Literal(team_id), sql.Literal(db_token)))
             conn.commit()
+        else:
+            db_token = db_token[0]
         cur.close()
         conn.close()
         self.client = SlackClient(db_token)
@@ -100,13 +102,13 @@ class Bot(object):
 
     def update_client(self, team_id):
 
-        if self.client.token == "":
-            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-            cur = conn.cursor()
-            cur.execute(sql.SQL("select bot_token FROM authed_teams WHERE team_id = {}").format(sql.Literal(team_id)))
-            db_token = cur.fetchone()
-            conn.commit()
-            cur.close()
-            conn.close()
-            self.client = SlackClient(db_token)
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        cur = conn.cursor()
+        cur.execute(sql.SQL("select bot_token FROM authed_teams WHERE team_id = {}").format(sql.Literal(team_id)))
+        db_token = cur.fetchone()[0]
+        conn.commit()
+        cur.close()
+        conn.close()
+        print(db_token)
+        self.client = SlackClient(db_token)
 
