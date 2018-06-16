@@ -95,3 +95,18 @@ class Bot(object):
                                             icon_emoji=self.emoji,
                                             attachments=msg.attachments
                                             )
+
+        print(post_message)
+
+    def update_client(self, team_id):
+
+        if self.client.token == "":
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            cur = conn.cursor()
+            cur.execute(sql.SQL("select bot_token FROM authed_teams WHERE team_id = {}").format(sql.Literal(team_id)))
+            db_token = cur.fetchone()
+            conn.commit()
+            cur.close()
+            conn.close()
+            self.client = SlackClient(db_token)
+

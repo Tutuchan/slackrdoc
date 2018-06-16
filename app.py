@@ -39,12 +39,12 @@ def _event_handler(event_type, slack_event):
     if event_type == "message":
         if slack_event["event"]["channel_type"] == "channel":
             event_text = slack_event["event"]["text"]
-            pattern = re.compile('\w+::\w+')
             match = re.search(r"(?P<package>\w+)::(?P<function>\w+)", event_text)
-            if (match):
+            if match:
                 channel_id = slack_event["event"]["channel"]
                 pkg = match.group('package')
                 fun = match.group('function')
+                pyBot.update_client(team_id)
                 pyBot.documentation_message(pkg, fun, channel_id)
                 return make_response("Documentation message sent", 200,)
 
