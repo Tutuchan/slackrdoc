@@ -14,6 +14,7 @@ from slackclient import SlackClient
 # as a global object. When your bot is out of development, it's best to
 # save this in a more persistant memory store.
 authed_teams = {}
+print(authed_teams)
 
 
 class Bot(object):
@@ -88,12 +89,8 @@ class Bot(object):
         fun_str = package + '::' + fun + '()'
         msg.create_attachments(desc.text, desc.url, fun_str)
 
-        print(msg.attachments)
-
         post_message = self.client.api_call("chat.postMessage",
                                             channel=channel,
                                             icon_emoji=self.emoji,
                                             attachments=msg.attachments
                                             )
-
-        print(post_message)

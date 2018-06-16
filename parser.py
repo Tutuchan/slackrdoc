@@ -29,5 +29,11 @@ class Parser(object):
         request = urllib.request.Request(self.url)
         result = urllib.request.urlopen(request).read().decode("UTF-8")
         soup = BeautifulSoup(result, 'html.parser').find(class_="topic packageData")
+        raw_text = str(soup.select("div > section")[0].select("p")[0])
 
-        self.text = soup.select("div > section")[0].select("p > p")[0].get_text()
+        self.text = raw_text. \
+            replace("<p>", ""). \
+            replace("</p>", ""). \
+            replace("<code>", "`"). \
+            replace("</code>", "`"). \
+            strip()

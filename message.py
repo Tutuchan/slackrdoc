@@ -15,7 +15,7 @@ class Message(object):
         super(Message, self).__init__()
         self.channel = ""
         self.timestamp = ""
-        self.text = "Hello World"
+        self.text = ""
         self.attachments = []
 
     def create_attachments(self, description, url, fun):
