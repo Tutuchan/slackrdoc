@@ -5,16 +5,12 @@ Python Slack Bot class for use with the RDocumentation app
 import os
 import message
 import parser
+import psycopg2
+from psycopg2 import sql
 import sys
-
 from slackclient import SlackClient
 
-# To remember which teams have authorized your app and what tokens are
-# associated with each team, we can store this information in memory on
-# as a global object. When your bot is out of development, it's best to
-# save this in a more persistant memory store.
-authed_teams = {}
-print(authed_teams)
+DATABASE_URL = os.environ['DATABASE_URL']
 
 
 class Bot(object):
@@ -37,8 +33,6 @@ class Bot(object):
     def auth(self, code):
         """
         Authenticate with OAuth and assign correct scopes.
-        Save a dictionary of authed team information in memory on the bot
-        object.
 
         Parameters
         ----------
@@ -56,15 +50,23 @@ class Bot(object):
                                 client_secret=self.oauth["client_secret"],
                                 code=code
                                 )
-        # To keep track of authorized teams and their associated OAuth tokens,
-        # we will save the team ID and bot tokens to the global
-        # authed_teams object
         team_id = auth_response["team_id"]
-        authed_teams[team_id] = {"bot_token":
-                                 auth_response["bot"]["bot_access_token"]}
-        # Then we'll reconnect to the Slack Client with the correct team's
-        # bot token
-        self.client = SlackClient(authed_teams[team_id]["bot_token"])
+        # To keep track of authorized teams and their associated OAuth tokens,
+        # we will save the team ID and bot tokens to Postgre
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        cur = conn.cursor()
+        cur.execute("CREATE TABLE IF NOT EXISTS authed_teams (id serial PRIMARY KEY, team_id varchar, bot_token varchar);")
+        cur.execute(sql.SQL("select bot_token FROM authed_teams WHERE team_id = {}").format(sql.Literal(team_id)))
+        db_token = cur.fetchone()
+        if db_token is None:
+            db_token = auth_response["bot"]["bot_access_token"]
+            cur.execute(sql.SQL("INSERT INTO authed_teams VALUES ({}, {})").format(sql.Literal(team_id), sql.Literal(db_token)))
+            conn.commit()
+
+        cur.close()
+        conn.close()
+        self.client = SlackClient(db_token)
 
     def documentation_message(self, package, fun, channel):
         """

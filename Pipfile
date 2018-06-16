@@ -8,6 +8,7 @@ flask = "*"
 "beautifulsoup4" = "*"
 gunicorn = "*"
 slackclient = "*"
+"psycopg2-binary" = "*"
 
 [dev-packages]
 
