@@ -98,9 +98,12 @@ class Bot(object):
                                             attachments=msg.attachments
                                             )
 
-        print(post_message)
-
     def update_client(self, team_id):
+        """
+        Update the Slack client object with the OAuth token associated to the team associated with the event
+        :param team_id:
+        :return:
+        """
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         cur = conn.cursor()
@@ -109,6 +112,5 @@ class Bot(object):
         conn.commit()
         cur.close()
         conn.close()
-        print(db_token)
         self.client = SlackClient(db_token)
 

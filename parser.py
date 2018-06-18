@@ -3,6 +3,7 @@ Python class to parse RDocumentation website and retrieve function description
 """
 
 import urllib.request
+from xml.etree import ElementTree
 from bs4 import BeautifulSoup
 
 class Parser(object):
@@ -29,11 +30,10 @@ class Parser(object):
         request = urllib.request.Request(self.url)
         result = urllib.request.urlopen(request).read().decode("UTF-8")
         soup = BeautifulSoup(result, 'html.parser').find(class_="topic packageData")
-        raw_text = str(soup.select("div > section")[0].select("p")[0])
-
-        self.text = raw_text. \
-            replace("<p>", ""). \
-            replace("</p>", ""). \
+        raw_text = str(soup.select("div > section")[0].select("p")[0]). \
+            replace("\n", " "). \
             replace("<code>", "`"). \
             replace("</code>", "`"). \
             strip()
+
+        self.text = ''.join(ElementTree.fromstring(raw_text).itertext())
