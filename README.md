@@ -10,6 +10,13 @@ and a link to the complete documentation.
 An instance of the bot is deployed on Heroku at https://slackrdoc.herokuapp.com/install. Just click the button and
 select your Slack workspace.
 
+## Usage
+
+Once installed, the bot will listen to all messages in public channels and when it encounters a message of the form
+`package::function`, it will send back a message with a short description and a link to the function documentation.
+
+![](rdoc.gif)
+
 ## Deployment
 
 If you want to deploy on your own Heroku instance, you need a working Heroku app with the Postgres addon. Add the
