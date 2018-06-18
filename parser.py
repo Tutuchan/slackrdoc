@@ -1,5 +1,5 @@
 """
-Python class to parse RDocumentation website and retrieve function description
+Python class to parse the RDocumentation website and retrieve function description
 """
 
 import urllib.request
@@ -16,24 +16,29 @@ class Parser(object):
         self.package = package
         self.function = fun
 
-    """
-    Build the RDocumentation URL
-    """
+
     def build_url(self):
+        """
+        Build the RDocumentation URL.
+        """
         self.url = "https://www.rdocumentation.org/packages/" + self.package + "/topics/" + self.function
 
-    """
-    Retrieve the function description.
-    """
+
     def retrieve_desc(self):
+        """
+        Retrieve the function description from the page.
+        """
         self.build_url()
         request = urllib.request.Request(self.url)
         result = urllib.request.urlopen(request).read().decode("UTF-8")
         soup = BeautifulSoup(result, 'html.parser').find(class_="topic packageData")
+
+        # Extract the correct part of the page and format it
         raw_text = str(soup.select("div > section")[0].select("p")[0]). \
             replace("\n", " "). \
             replace("<code>", "`"). \
             replace("</code>", "`"). \
             strip()
 
+        # Remove remaining HTML tags
         self.text = ''.join(ElementTree.fromstring(raw_text).itertext())

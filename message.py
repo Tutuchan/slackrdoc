@@ -20,9 +20,11 @@ class Message(object):
 
     def create_attachments(self, description, url, fun):
         """
-        Open JSON message attachments file and create attachments for
-        message. Saves a dictionary of formatted attachments on
-        the bot object.
+        Create the attachment for the function documentation.
+        :param description: String, a short description of the function
+        :param url: String, the full URL to the documentation
+        :param fun: String, the fully qualified function name (package::function())
+        :return: Nothing, the attachments fields is updated.
         """
         actions = [{"name": "visit", "type": "button", "text": "View documentation", "url": url}]
         self.attachments = [{"fallback": url, "title": fun, "text": description, "attachment_type": "default", "actions": actions}]

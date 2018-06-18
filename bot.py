@@ -10,8 +10,8 @@ from psycopg2 import sql
 import sys
 from slackclient import SlackClient
 
+# The Postgre database URL to store the id of the teams and their OAuth tokens.
 DATABASE_URL = os.environ['DATABASE_URL']
-
 
 class Bot(object):
     """ Instanciates a Bot object to handle Slack RDocumentation interactions."""
@@ -19,13 +19,8 @@ class Bot(object):
         super(Bot, self).__init__()
         self.name = "RDocumentation"
         self.emoji = ":book:"
-        # When we instantiate a new bot object, we can access the app
-        # credentials we set earlier in our local development environment.
         self.oauth = {"client_id": os.environ.get("CLIENT_ID"),
                       "client_secret": os.environ.get("CLIENT_SECRET"),
-                      # Scopes provide and limit permissions to what our app
-                      # can access. It's important to use the most restricted
-                      # scope that your app will need.
                       "scope": "bot"}
         self.verification = os.environ.get("VERIFICATION_TOKEN")
         self.client = SlackClient("")
@@ -78,7 +73,7 @@ class Bot(object):
         ----------
         package : str
             name of the R package
-        function : str
+        fun : str
             name of the R function in the package
         channel : str
             id of the Slack channel where to post the message
@@ -101,8 +96,8 @@ class Bot(object):
     def update_client(self, team_id):
         """
         Update the Slack client object with the OAuth token associated to the team associated with the event
-        :param team_id:
-        :return:
+        :param team_id: the id of the team requesting the message
+        :return: Nothing, the client field is updated with the correct token
         """
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')

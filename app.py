@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-A routing layer for the onboarding bot tutorial built using
-[Slack's Events API](https://api.slack.com/events-api) in Python
+A routing layer for the RDocumentation bot, heavily inspired by the Python
+[onboarding bot tutorial](https://github.com/slackapi/Slack-Python-Onboarding-Tutorial)
 """
 import json
 import bot
@@ -23,7 +23,7 @@ def _event_handler(event_type, slack_event):
     Parameters
     ----------
     event_type : str
-        type of event recieved from Slack
+        type of event received from Slack
     slack_event : dict
         JSON response from a Slack reaction event
 
@@ -34,8 +34,6 @@ def _event_handler(event_type, slack_event):
 
     """
     team_id = slack_event["team_id"]
-    # ================ Team Join Events =============== #
-    # When the user first joins a team, the type of event will be team_join
     if event_type == "message":
         if slack_event["event"]["channel_type"] == "channel":
             event_text = slack_event["event"]["text"]
@@ -62,8 +60,6 @@ def pre_install():
     # them more easily while we're developing our app.
     client_id = pyBot.oauth["client_id"]
     scope = pyBot.oauth["scope"]
-    # Our template is using the Jinja templating language to dynamically pass
-    # our client id and scope
     return render_template("install.html", client_id=client_id, scope=scope)
 
 
@@ -92,10 +88,6 @@ def hears():
     slack_event = json.loads(request.data)
 
     # ============= Slack URL Verification ============ #
-    # In order to verify the url of our endpoint, Slack will send a challenge
-    # token in a request and check for this token in the response our endpoint
-    # sends back.
-    #       For more info: https://api.slack.com/events/url_verification
     if "challenge" in slack_event:
         return make_response(slack_event["challenge"], 200, {"content_type":
                                                              "application/json"
@@ -107,16 +99,11 @@ def hears():
     if pyBot.verification != slack_event.get("token"):
         message = "Invalid Slack verification token: %s \npyBot has: \
                    %s\n\n" % (slack_event["token"], pyBot.verification)
-        # By adding "X-Slack-No-Retry" : 1 to our response headers, we turn off
-        # Slack's automatic retries during development.
         make_response(message, 403, {"X-Slack-No-Retry": 1})
 
     # ====== Process Incoming Events from Slack ======= #
-    # If the incoming request is an Event we've subcribed to
     if "event" in slack_event:
-
         event_type = slack_event["event"]["type"]
-        # Then handle the event by event_type and have your bot respond
         return _event_handler(event_type, slack_event)
     # If our bot hears things that are not events we've subscribed to,
     # send a quirky but helpful error response
