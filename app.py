@@ -35,6 +35,7 @@ def _event_handler(event_type, slack_event):
     """
     team_id = slack_event["team_id"]
     if event_type == "message":
+        print(slack_event)
         if slack_event["event"]["channel_type"] in ["channel", "group"]:
             if "text" in slack_event["event"]:
                 event_text = slack_event["event"]["text"]

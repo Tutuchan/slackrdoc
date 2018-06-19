@@ -98,6 +98,7 @@ class Bot(object):
                                             icon_emoji=self.emoji,
                                             attachments=msg.attachments
                                             )
+        print(post_message)
 
     def update_client(self, team_id):
         """
