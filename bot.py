@@ -21,7 +21,7 @@ class Bot(object):
         self.emoji = ":book:"
         self.oauth = {"client_id": os.environ.get("CLIENT_ID"),
                       "client_secret": os.environ.get("CLIENT_SECRET"),
-                      "scope": "bot, channels:history"}
+                      "scope": "bot,channels:history"}
         self.verification = os.environ.get("VERIFICATION_TOKEN")
         self.client = SlackClient("")
 
@@ -55,12 +55,13 @@ class Bot(object):
         cur.execute("CREATE TABLE IF NOT EXISTS authed_teams (id serial PRIMARY KEY, team_id varchar, bot_token varchar(256));")
         cur.execute(sql.SQL("select bot_token FROM authed_teams WHERE team_id = {}").format(sql.Literal(team_id)))
         db_token = cur.fetchone()
-        if db_token is None:
-            db_token = auth_response["bot"]["bot_access_token"]
-            cur.execute(sql.SQL("INSERT INTO authed_teams (team_id, bot_token) VALUES ({}, {})").format(sql.Literal(team_id), sql.Literal(db_token)))
+
+        if db_token is not None:
+            cur.execute(sql.SQL("DELETE FROM authed_teams WHERE team_id = {}").format(sql.Literal(team_id)))
             conn.commit()
-        else:
-            db_token = db_token[0]
+        db_token = auth_response["bot"]["bot_access_token"]
+        cur.execute(sql.SQL("INSERT INTO authed_teams (team_id, bot_token) VALUES ({}, {})").format(sql.Literal(team_id), sql.Literal(db_token)))
+        conn.commit()
         cur.close()
         conn.close()
         self.client = SlackClient(db_token)
