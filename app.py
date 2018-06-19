@@ -35,18 +35,18 @@ def _event_handler(event_type, slack_event):
     """
     team_id = slack_event["team_id"]
     if event_type == "message":
-        if slack_event["event"]["channel_type"] == "channel":
-            event_text = slack_event["event"]["text"]
-            match = re.search(r"(?P<package>\w+)::(?P<function>\w+)", event_text)
-            if match:
-                channel_id = slack_event["event"]["channel"]
-                pkg = match.group('package')
-                fun = match.group('function')
-                pyBot.update_client(team_id)
-                pyBot.documentation_message(pkg, fun, channel_id)
-                return make_response("Documentation message sent", 200,)
+        if slack_event["event"]["channel_type"] in ["channel", "group"]:
+            if "text" in slack_event["event"]:
+                event_text = slack_event["event"]["text"]
+                match = re.search(r"(?P<package>\w+)::(?P<function>\w+)", event_text)
+                if match:
+                    channel_id = slack_event["event"]["channel"]
+                    pkg = match.group('package')
+                    fun = match.group('function')
+                    pyBot.update_client(team_id)
+                    pyBot.documentation_message(pkg, fun, channel_id)
+                    return make_response("Documentation message sent", 200,)
 
-    # ============= Event Type Not Found! ============= #
     # If the event_type does not have a handler
     message = "You have not added an event handler for the %s" % event_type
     # Return a helpful error message
@@ -86,8 +86,6 @@ def hears():
     handler helper function to route events to our Bot.
     """
     slack_event = json.loads(request.data)
-
-    print(slack_event)
 
     # ============= Slack URL Verification ============ #
     if "challenge" in slack_event:
