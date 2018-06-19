@@ -87,6 +87,8 @@ def hears():
     """
     slack_event = json.loads(request.data)
 
+    print(slack_event)
+
     # ============= Slack URL Verification ============ #
     if "challenge" in slack_event:
         return make_response(slack_event["challenge"], 200, {"content_type":
