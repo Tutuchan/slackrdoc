@@ -45,6 +45,7 @@ class Bot(object):
                                 client_secret=self.oauth["client_secret"],
                                 code=code
                                 )
+        print(auth_response)
         team_id = auth_response["team_id"]
         # To keep track of authorized teams and their associated OAuth tokens,
         # we will save the team ID and bot tokens to Postgre
