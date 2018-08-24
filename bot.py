@@ -82,7 +82,7 @@ class Bot(object):
         cur.close()
         conn.close()
 
-    def documentation_message(self, package, fun, channel):
+    def documentation_message(self, package, fun, channel_id, thread_id):
         """
         Create and send a message containing a short description of the function
         and a link to the RDocumentation website
@@ -93,8 +93,10 @@ class Bot(object):
             name of the R package
         fun : str
             name of the R function in the package
-        channel : str
+        channel_id : str
             id of the Slack channel where to post the message
+        thread_id : str
+            id of the Slack thread where to post the message
 
         """
 
@@ -106,7 +108,8 @@ class Bot(object):
         msg.create_attachments(desc.text, desc.url, fun_str)
 
         post_message = self.client.api_call("chat.postMessage",
-                                            channel=channel,
+                                            channel=channel_id,
+                                            thread_ts=thread_id,
                                             icon_emoji=self.emoji,
                                             attachments=msg.attachments
                                             )
@@ -152,7 +155,6 @@ class Bot(object):
         cur = conn.cursor()
         cur.execute(sql.SQL("SELECT * FROM events WHERE event_id = {};").format(sql.Literal(event_id)))
         db_event = cur.fetchone()
-        print(db_event)
         conn.commit()
         cur.close()
         conn.close()

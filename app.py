@@ -44,10 +44,16 @@ def _event_handler(event_type, slack_event):
                         match = re.search(r"(?P<package>\w+)::(?P<function>\w+)", event_text)
                         if match:
                             channel_id = slack_event["event"]["channel"]
+                            # if message comes from a thread, reply to the thread
+                            # otherwise, create a new thread 
+                            if "thread_ts" in slack_event["event"]:
+                                thread_id = slack_event["event"]["thread_ts"] 
+                            else:
+                                thread_id = slack_event["event"]["ts"] 
                             pkg = match.group('package')
                             fun = match.group('function')
                             pyBot.update_client(team_id)
-                            pyBot.documentation_message(pkg, fun, channel_id)
+                            pyBot.documentation_message(pkg, fun, channel_id, thread_id)
                             pyBot.store_event_id(event_id)
                             return make_response("Documentation message sent", 200,)
                     except Exception as err:
