@@ -24,6 +24,7 @@ class Bot(object):
                       "scope": "bot,channels:history,groups:history"}
         self.verification = os.environ.get("VERIFICATION_TOKEN")
         self.client = SlackClient("")
+        self.create_tables()
 
     def auth(self, code):
         """
@@ -53,7 +54,6 @@ class Bot(object):
 
             conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             cur = conn.cursor()
-            cur.execute("CREATE TABLE IF NOT EXISTS authed_teams (id serial PRIMARY KEY, team_id varchar, bot_token varchar(256));")
             cur.execute(sql.SQL("select bot_token FROM authed_teams WHERE team_id = {}").format(sql.Literal(team_id)))
             db_token = cur.fetchone()
 
@@ -69,6 +69,18 @@ class Bot(object):
         else:
             print("Authentication failed!\n")
             print(auth_response)
+    
+    def create_tables(self):
+        """
+        Create the SQL tables
+        """
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        cur = conn.cursor()
+        cur.execute("CREATE TABLE IF NOT EXISTS authed_teams (id serial PRIMARY KEY, team_id varchar, bot_token varchar(256));")
+        cur.execute("CREATE TABLE IF NOT EXISTS events (event_id varchar(256));")
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def documentation_message(self, package, fun, channel):
         """
@@ -124,7 +136,6 @@ class Bot(object):
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         cur = conn.cursor()
-        cur.execute("CREATE TABLE IF NOT EXISTS events (event_id varchar(256));")
         cur.execute(sql.SQL("INSERT INTO events (event_id) VALUES ({})").format(sql.Literal(event_id)))
         conn.commit()
         cur.close()
