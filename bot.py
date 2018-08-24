@@ -139,9 +139,9 @@ class Bot(object):
 
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         cur = conn.cursor()
-        cur.execute("CREATE TABLE IF NOT EXISTS events (event_id varchar(256));")
-        cur.execute(sql.SQL("SELECT * FROM events (event_id) VALUES ({})").format(sql.Literal(event_id)))
-        db_event = cur.fetchone()[0]
+        cur.execute(sql.SQL("SELECT * FROM events WHERE event_id = {};").format(sql.Literal(event_id)))
+        db_event = cur.fetchone()
+        print(db_event)
         conn.commit()
         cur.close()
         conn.close()
