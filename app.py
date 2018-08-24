@@ -36,20 +36,23 @@ def _event_handler(event_type, slack_event):
     team_id = slack_event["team_id"]
     if event_type == "message":
         if slack_event["event"]["channel_type"] in ["channel", "group"]:
-            if "text" in slack_event["event"]:
-                try:
-                    event_text = slack_event["event"]["text"]
-                    match = re.search(r"(?P<package>\w+)::(?P<function>\w+)", event_text)
-                    if match:
-                        channel_id = slack_event["event"]["channel"]
-                        pkg = match.group('package')
-                        fun = match.group('function')
-                        pyBot.update_client(team_id)
-                        pyBot.documentation_message(pkg, fun, channel_id)
-                        return make_response("Documentation message sent", 200,)
-                except Exception:
-                    print("Error:\n")
-                    print(slack_event)
+            if "text" in slack_event["event"] and slack_event["event"]["text"] is not None:
+                event_id = slack_event["event_id"]
+                if not pyBot.check_event_id(event_id):
+                    try:
+                        event_text = slack_event["event"]["text"]
+                        match = re.search(r"(?P<package>\w+)::(?P<function>\w+)", event_text)
+                        if match:
+                            channel_id = slack_event["event"]["channel"]
+                            pkg = match.group('package')
+                            fun = match.group('function')
+                            pyBot.update_client(team_id)
+                            pyBot.documentation_message(pkg, fun, channel_id)
+                            pyBot.store_event_id(event_id)
+                            return make_response("Documentation message sent", 200,)
+                    except Exception as err:
+                        print(err)
+                        print(slack_event)
 
     # If the event_type does not have a handler
     message = "You have not added an event handler for the %s" % event_type

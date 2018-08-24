@@ -32,7 +32,6 @@ The DATABASE_URL variable should have been set and added when attaching the Post
 
 ## TODO
 
-+ add throttle for when the instance restarts,
 + rework as a package,
 + refactor SQL code in a module,
 + improve the templates,

@@ -115,3 +115,36 @@ class Bot(object):
         conn.close()
         self.client = SlackClient(db_token)
 
+    def store_event_id(self, event_id):
+        """
+        Store the event id in order not to send messages multiple time for the same event.
+        :param event_id: the id of the event
+        :return: Nothing
+        """
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        cur = conn.cursor()
+        cur.execute("CREATE TABLE IF NOT EXISTS events (event_id varchar(256));")
+        cur.execute(sql.SQL("INSERT INTO events (event_id) VALUES ({})").format(sql.Literal(event_id)))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    def check_event_id(self, event_id):
+        """
+        Check in the database if the event has already been processed.
+        :param event_id: the id of the event
+        :return: A boolean, true if the event has been processed already
+        """
+
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        cur = conn.cursor()
+        cur.execute("CREATE TABLE IF NOT EXISTS events (event_id varchar(256));")
+        cur.execute(sql.SQL("SELECT * FROM events (event_id) VALUES ({})").format(sql.Literal(event_id)))
+        db_event = cur.fetchone()[0]
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        db_event is not None
+
