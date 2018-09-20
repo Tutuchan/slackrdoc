@@ -43,6 +43,7 @@ def _event_handler(event_type, slack_event):
                         event_text = slack_event["event"]["text"]
                         match = re.search(r"(?P<package>\w+)::(?P<function>\w+)", event_text)
                         if match:
+                            print(slack_event)
                             channel_id = slack_event["event"]["channel"]
                             # if message comes from a thread, reply to the thread
                             # otherwise, create a new thread 
