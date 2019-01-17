@@ -1,6 +1,6 @@
 # slackrdoc
 
-This is a simple Slack bot that listens to messages written in Slack for patterns like `<package>::<function>`, then
+This is a simple Slack bot that listens to messages written in Slack for patterns like `?<package>::<function>`, then
 visits the [RDocumentation](https://www.rdocumentation.org/) page for this function. If such a function exists, it then
 sends a message back to the Slack channel where the first message originated with a brief description of the function
 and a link to the complete documentation.
@@ -13,7 +13,7 @@ select your Slack workspace.
 ## Usage
 
 Once installed, the bot will listen to all messages in public channels and when it encounters a message of the form
-`package::function`, it will send back a message with a short description and a link to the function documentation.
+`?package::function`, it will send back a message with a short description and a link to the function documentation.
 
 ![](rdoc.gif)
 

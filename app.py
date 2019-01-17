@@ -41,7 +41,7 @@ def _event_handler(event_type, slack_event):
                 if not pyBot.check_event_id(event_id):
                     try:
                         event_text = slack_event["event"]["text"]
-                        match = re.search(r"(?P<package>\w+)::(?P<function>\w+)", event_text)
+                        match = re.search(r"\?(?P<package>\w+)::(?P<function>\w+)", event_text)
                         if match:
                             print(slack_event)
                             channel_id = slack_event["event"]["channel"]
